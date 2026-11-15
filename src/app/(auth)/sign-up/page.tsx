@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React, { useState, useRef, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User,
   Mail,
@@ -15,9 +15,10 @@ import {
   ShieldCheck,
   ChevronDown,
   Check,
-} from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { authClient } from "@/lib/auth-client"
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { signUp } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -39,16 +40,16 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
       />
     </svg>
-  )
+  );
 }
 
-type Role = "Seeker" | "Recruiter" | "admin"
+type Role = "Seeker" | "Recruiter" | "admin";
 
 interface RoleOption {
-  value: Role
-  label: string
-  description: string
-  icon: React.ElementType
+  value: Role;
+  label: string;
+  description: string;
+  icon: React.ElementType;
 }
 
 const roleOptions: RoleOption[] = [
@@ -70,21 +71,17 @@ const roleOptions: RoleOption[] = [
     description: "Platform management",
     icon: ShieldCheck,
   },
-]
+];
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const [role, setRole] = useState<Role>("Seeker")
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const router = useRouter();
+  const [role, setRole] = useState<Role>("Seeker");
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [fullName, setFullName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [agreeTerms, setAgreeTerms] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -93,53 +90,53 @@ export default function SignUpPage() {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsRoleDropdownOpen(false)
+        setIsRoleDropdownOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const selectedRole =
-    roleOptions.find((r) => r.value === role) || roleOptions[0]
-  const SelectedIcon = selectedRole.icon
+    roleOptions.find((r) => r.value === role) || roleOptions[0];
+  const SelectedIcon = selectedRole.icon;
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+  const handleSignUp = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const user = Object.fromEntries(formData.entries()) as Record<string, string>
 
     try {
-      await authClient.signUp.email({
-        email,
-        password,
-        name: fullName,
-        role,
-        callbackURL: "/",
-        fetchOptions: {
-          onError: (ctx) => {
-            setError(ctx.error.message || "Failed to create account")
-            setIsLoading(false)
-          },
-          onSuccess: () => {
+      const {data, error} = await signUp.email({
+        email: user.email,
+        password: user.password,
+        name: user.name,
+        role: user.role,
+        callbackURL: "/"},
+        {
+        onRequest: (ctx) => {
+            setIsLoading(true);
+        },
+        onSuccess: (ctx) => {
+            toast.success("Your account is create successfully!")
             setIsLoading(false)
             router.push("/")
-          },
         },
+        onError: (ctx) => {
+            // display the error message
+            toast.error(ctx.error.message);
+        }
       })
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError("An unexpected error occurred")
-      }
+    } catch (error) {
+      console.log("Can't create account",error)
       setIsLoading(false)
     }
-  }
+  };
 
   const handleGoogleSignIn = () => {
-    console.log("Signing up with Google...")
-  }
+    console.log("Signing up with Google...");
+  };
 
   return (
     <div className="w-full max-w-[440px] rounded-2xl border border-white/[0.08] bg-[#0c0d14]/85 backdrop-blur-xl p-6 sm:p-8 shadow-[0_16px_50px_rgba(0,0,0,0.7)]">
@@ -172,23 +169,16 @@ export default function SignUpPage() {
         <div className="h-px flex-1 bg-white/[0.08]" />
       </div>
 
-      {/* Error alert if any */}
-      {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 leading-relaxed">
-          {error}
-        </div>
-      )}
-
       {/* Form */}
       <form onSubmit={handleSignUp} className="space-y-4">
         {/* User Role Dropdown */}
         <div className="space-y-1.5 relative" ref={dropdownRef}>
+          <input type="hidden" name="role" value={role} />
           <label className="text-xs font-medium text-neutral-300">
             Account Type
           </label>
           <button
             type="button"
-            onClick={() => setIsRoleDropdownOpen((prev) => !prev)}
             className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20 focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/30 text-white flex items-center justify-between transition-all duration-150 cursor-pointer text-left"
             aria-haspopup="listbox"
             aria-expanded={isRoleDropdownOpen}
@@ -215,15 +205,15 @@ export default function SignUpPage() {
           {isRoleDropdownOpen && (
             <div className="absolute top-[calc(100%+6px)] left-0 w-full z-40 rounded-xl border border-white/10 bg-[#0e0f18]/95 p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.85)] backdrop-blur-2xl space-y-1">
               {roleOptions.map((opt) => {
-                const Icon = opt.icon
-                const isSelected = role === opt.value
+                const Icon = opt.icon;
+                const isSelected = role === opt.value;
                 return (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() => {
-                      setRole(opt.value)
-                      setIsRoleDropdownOpen(false)
+                      setRole(opt.value);
+                      setIsRoleDropdownOpen(false);
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all duration-150 cursor-pointer ${
                       isSelected
@@ -254,7 +244,7 @@ export default function SignUpPage() {
                       <Check className="size-4 text-[#8c82ff] shrink-0" />
                     )}
                   </button>
-                )
+                );
               })}
             </div>
           )}
@@ -270,8 +260,7 @@ export default function SignUpPage() {
             <Input
               type="text"
               required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              name="name"
               placeholder="e.g. Alex Morgan"
               className="pl-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
@@ -288,8 +277,7 @@ export default function SignUpPage() {
             <Input
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
               placeholder="name@company.com"
               className="pl-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
@@ -307,9 +295,9 @@ export default function SignUpPage() {
               type={showPassword ? "text" : "password"}
               required
               minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
               placeholder="At least 8 characters"
+              n
               className="pl-10 pr-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
             <button
@@ -318,7 +306,11 @@ export default function SignUpPage() {
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
         </div>
@@ -333,7 +325,10 @@ export default function SignUpPage() {
             onChange={(e) => setAgreeTerms(e.target.checked)}
             className="size-4 rounded border-white/20 bg-white/[0.04] text-[#5c54f5] focus:ring-[#5c54f5]/40 accent-[#5c54f5] cursor-pointer mt-0.5"
           />
-          <label htmlFor="terms" className="text-xs text-neutral-400 leading-normal select-none cursor-pointer">
+          <label
+            htmlFor="terms"
+            className="text-xs text-neutral-400 leading-normal select-none cursor-pointer"
+          >
             I agree to HireLoop&apos;s{" "}
             <Link href="#terms" className="text-white hover:underline">
               Terms of Service
@@ -375,5 +370,5 @@ export default function SignUpPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
