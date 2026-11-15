@@ -1,5 +1,5 @@
 import React from "react"
-import { Briefcase, BarChart3, UserSearch, Star } from "lucide-react"
+import { Briefcase, BarChart2, UserSearch, Star } from "lucide-react"
 
 export interface StatItem {
   icon: React.ElementType
@@ -15,7 +15,7 @@ export function StatsCards() {
       label: "Active Jobs",
     },
     {
-      icon: BarChart3,
+      icon: BarChart2,
       value: "12K",
       label: "Companies",
     },
