@@ -40,7 +40,7 @@ export function Navbar() {
 
           {/* Sign In (soft purple matching reference design) */}
           <Link
-            href="#signin"
+            href="/sign-in"
             className="text-sm font-medium text-[#8c82ff] hover:text-[#a59eff] transition-colors"
           >
             Sign In
@@ -48,7 +48,7 @@ export function Navbar() {
 
           {/* Get Started Button */}
           <Link
-            href="#jobs"
+            href="/sign-up"
             className="rounded-xl bg-[#5c54f5] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 sm:px-5 sm:py-2 text-sm shadow-[0_0_20px_rgba(92,84,245,0.4)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             Get Started
@@ -87,14 +87,14 @@ export function Navbar() {
 
           <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
             <Link
-              href="#signin"
+              href="/sign-in"
               onClick={() => setMobileMenuOpen(false)}
               className="text-center py-2 text-sm font-medium text-[#8c82ff] hover:text-white border border-white/10 rounded-xl"
             >
               Sign In
             </Link>
             <Link
-              href="#jobs"
+              href="/sign-up"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full rounded-xl bg-[#5c54f5] text-white font-medium py-2.5 text-sm shadow-lg text-center"
             >
