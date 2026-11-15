@@ -2,56 +2,56 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { Menu, X, ArrowUpRight } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Logo } from "@/components/shared/logo"
-import { Button, buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navLinks = [
-    { label: "Explore Jobs", href: "#jobs" },
-    { label: "Companies", href: "#features" },
+    { label: "Browse Jobs", href: "#jobs" },
+    { label: "Company", href: "#features" },
     { label: "Pricing", href: "#pricing" },
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#050508]/75 backdrop-blur-xl transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+    <header className="sticky top-3 sm:top-5 z-50 w-full px-4 sm:px-6 lg:px-8 -mb-16 sm:-mb-20 pointer-events-none">
+      <div className="max-w-6xl mx-auto rounded-2xl border border-white/[0.08] bg-[#0c0d15]/85 backdrop-blur-xl px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.6)] pointer-events-auto">
         {/* Brand Logo */}
         <Logo size="md" />
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="text-sm font-medium text-neutral-300 hover:text-white transition-colors duration-200"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop Navigation Links & Actions */}
+        <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="flex items-center gap-6 lg:gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-sm font-normal text-neutral-300 hover:text-white transition-colors duration-200"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-        {/* Right CTA / Auth Buttons */}
-        <div className="hidden md:flex items-center gap-4">
+          {/* Divider */}
+          <div className="h-4 w-px bg-white/20" />
+
+          {/* Sign In (soft purple matching reference design) */}
           <Link
             href="#signin"
-            className="text-sm font-medium text-neutral-300 hover:text-white transition-colors px-3 py-1.5"
+            className="text-sm font-medium text-[#8c82ff] hover:text-[#a59eff] transition-colors"
           >
             Sign In
           </Link>
+
+          {/* Get Started Button */}
           <Link
-            href="#post-a-job"
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium px-5 py-2 text-sm shadow-[0_0_24px_rgba(99,102,241,0.35)] border border-indigo-400/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-            )}
+            href="#jobs"
+            className="rounded-xl bg-[#5c54f5] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 sm:px-5 sm:py-2 text-sm shadow-[0_0_20px_rgba(92,84,245,0.4)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Post a Job
-            <ArrowUpRight className="ml-1 size-3.5 opacity-80" />
+            Get Started
           </Link>
         </div>
 
@@ -71,7 +71,7 @@ export function Navbar() {
 
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-white/10 bg-[#07070c]/95 backdrop-blur-2xl px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-200">
+        <div className="md:hidden max-w-6xl mx-auto mt-2 rounded-2xl border border-white/10 bg-[#0d0e16]/95 backdrop-blur-2xl p-5 space-y-4 shadow-2xl pointer-events-auto animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col space-y-3">
             {navLinks.map((link) => (
               <Link
@@ -89,19 +89,16 @@ export function Navbar() {
             <Link
               href="#signin"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-center py-2 text-sm font-medium text-neutral-300 hover:text-white border border-white/10 rounded-full"
+              className="text-center py-2 text-sm font-medium text-[#8c82ff] hover:text-white border border-white/10 rounded-xl"
             >
               Sign In
             </Link>
             <Link
-              href="#post-a-job"
+              href="#jobs"
               onClick={() => setMobileMenuOpen(false)}
-              className={cn(
-                buttonVariants({ variant: "default" }),
-                "w-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium py-2 text-sm shadow-lg text-center"
-              )}
+              className="w-full rounded-xl bg-[#5c54f5] text-white font-medium py-2.5 text-sm shadow-lg text-center"
             >
-              Post a Job
+              Get Started
             </Link>
           </div>
         </div>

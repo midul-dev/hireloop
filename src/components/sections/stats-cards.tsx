@@ -1,6 +1,5 @@
 import React from "react"
-import { Briefcase, Building2, Users, Award } from "lucide-react"
-import { Card } from "@/components/ui/card"
+import { Briefcase, BarChart3, UserSearch, Star } from "lucide-react"
 
 export interface StatItem {
   icon: React.ElementType
@@ -16,49 +15,44 @@ export function StatsCards() {
       label: "Active Jobs",
     },
     {
-      icon: Building2,
+      icon: BarChart3,
       value: "12K",
       label: "Companies",
     },
     {
-      icon: Users,
+      icon: UserSearch,
       value: "2M",
       label: "Job Seekers",
     },
     {
-      icon: Award,
+      icon: Star,
       value: "97%",
-      label: "Satisfaction Rate",
+      label: "Satisfication Rate",
     },
   ]
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {stats.map((stat, idx) => {
           const Icon = stat.icon
           return (
-            <Card
+            <div
               key={idx}
-              className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0d14]/85 backdrop-blur-md p-6 hover:border-indigo-500/40 hover:bg-[#10121d]/90 transition-all duration-300 shadow-xl hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0d14]/90 backdrop-blur-md p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 hover:bg-[#10121d]/95 transition-all duration-300 shadow-xl min-h-[150px] sm:min-h-[165px] text-left"
             >
-              {/* Subtle hover gradient highlight */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-              <div className="flex flex-col justify-between h-full space-y-4">
-                <div className="size-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-neutral-300 group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-colors">
-                  <Icon className="size-4" />
+              <div>
+                <Icon className="size-5 text-neutral-300 stroke-[1.5] group-hover:text-white transition-colors" />
+              </div>
+              <div className="mt-8 sm:mt-10">
+                <div className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-1">
+                  {stat.value}
                 </div>
-                <div>
-                  <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-indigo-200 transition-all">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs sm:text-sm text-neutral-400 mt-1 font-medium">
-                    {stat.label}
-                  </div>
+                <div className="text-xs sm:text-sm text-neutral-400 font-normal">
+                  {stat.label}
                 </div>
               </div>
-            </Card>
+            </div>
           )
         })}
       </div>
