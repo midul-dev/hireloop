@@ -4,6 +4,9 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { signIn } from "@/lib/auth-client"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -29,19 +32,39 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export default function SignInPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn =async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsLoading(true)
-    // Simulated auth flow
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1200)
+  const formData = new FormData(e.currentTarget)
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
+  const rememberMe = formData.get("rememberMe") ==="on"
+
+console.log(email, password, rememberMe)
+
+    const { data, error } = await signIn.email({
+      email,
+      password,
+      rememberMe,
+    },{
+      
+    onRequest: () => setIsLoading(true),
+    onSuccess: (ctx) => {
+      setIsLoading(false);
+      toast.success(`Welcome back, ${ctx.data.user.name}!`);
+      router.push("/");
+    },
+    onError: (ctx) => {
+      setIsLoading(false);
+      toast.error(ctx.error.message);
+    },
+  
+    })
   }
 
   const handleGoogleSignIn = () => {
@@ -92,8 +115,7 @@ export default function SignInPage() {
             <Input
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
               placeholder="name@company.com"
               className="pl-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
@@ -118,8 +140,7 @@ export default function SignInPage() {
             <Input
               type={showPassword ? "text" : "password"}
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
               placeholder="••••••••"
               className="pl-10 pr-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
@@ -139,8 +160,7 @@ export default function SignInPage() {
           <input
             type="checkbox"
             id="remember"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
+            name="rememberMe"
             className="size-4 rounded border-white/20 bg-white/[0.04] text-[#5c54f5] focus:ring-[#5c54f5]/40 accent-[#5c54f5] cursor-pointer"
           />
           <label htmlFor="remember" className="text-xs text-neutral-400 select-none cursor-pointer">

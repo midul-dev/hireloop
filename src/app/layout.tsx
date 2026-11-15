@@ -34,12 +34,12 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="en" data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} dark scroll-smooth h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#050508] text-white selection:bg-indigo-500/30 selection:text-indigo-200 antialiased overflow-x-hidden">
         <main>{children}</main>
-        <Toaster />
+        <Toaster position= "top-center" />
       </body>
     </html>
   );

@@ -126,6 +126,7 @@ export default function SignUpPage() {
         onError: (ctx) => {
             // display the error message
             toast.error(ctx.error.message);
+            setIsLoading(false);
         }
       })
     } catch (error) {
@@ -179,6 +180,7 @@ export default function SignUpPage() {
           </label>
           <button
             type="button"
+            onClick={() => setIsRoleDropdownOpen((prev) => !prev)}
             className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20 focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/30 text-white flex items-center justify-between transition-all duration-150 cursor-pointer text-left"
             aria-haspopup="listbox"
             aria-expanded={isRoleDropdownOpen}
@@ -297,7 +299,6 @@ export default function SignUpPage() {
               minLength={8}
               name="password"
               placeholder="At least 8 characters"
-              n
               className="pl-10 pr-10 h-11 bg-white/[0.03] border-white/10 focus-visible:border-indigo-500/80 focus-visible:ring-indigo-500/30 text-white placeholder:text-neutral-500"
             />
             <button
