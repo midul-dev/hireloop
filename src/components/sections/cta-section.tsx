@@ -1,63 +1,45 @@
 import React from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { buttonVariants } from "@/components/ui/button"
-import { ArrowRight, Sparkles } from "lucide-react"
-import { cn } from "@/lib/utils"
 import ctaBgImg from "@/assets/cta-bg.png"
 
 export function CTASection() {
   return (
-    <section className="relative w-full pt-16 pb-28 overflow-hidden bg-[#050508]">
-      {/* Background celestial globe horizon */}
-      <div className="relative w-full max-w-5xl mx-auto flex flex-col items-center">
-        {/* CTA Background Artwork */}
-        <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] overflow-hidden rounded-3xl">
-          <Image
-            src={ctaBgImg}
-            alt="HireLoop Career Horizon"
-            fill
-            className="object-cover object-center pointer-events-none select-none opacity-90"
-          />
-          {/* Subtle blending fades */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-transparent to-[#050508]/60 pointer-events-none" />
-        </div>
+    <section
+      style={{
+        backgroundImage: `url(${ctaBgImg.src})`,
+        backgroundPosition: "center 40px",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "1440px auto",
+      }}
+      className="relative w-full pt-28 sm:pt-36 md:pt-44 pb-28 sm:pb-36 overflow-hidden bg-[#050508] flex flex-col items-center justify-center text-center"
+    >
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
+        {/* Main Heading */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-extrabold tracking-tight text-white mb-4 sm:mb-5 max-w-3xl leading-[1.15]">
+          Your next role is
+          <br />
+          already looking for you
+        </h2>
 
-        {/* Floating Content over the Globe Horizon */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-[11px] font-semibold text-indigo-300 uppercase tracking-widest mb-4 backdrop-blur-md">
-            <Sparkles className="size-3" /> Get Hired Faster
-          </div>
+        {/* Subtitle */}
+        <p className="text-neutral-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal">
+          Build a profile in three minutes. The matches start arriving tomorrow morning.
+        </p>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 max-w-2xl leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
-            Your next role is already looking for you
-          </h2>
-
-          <p className="text-neutral-300 text-sm sm:text-base max-w-xl mb-8 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-            Build a profile in 10 minutes. Top companies start coming to you this week.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link
-              href="#create-account"
-              className={cn(
-                buttonVariants({ variant: "default" }),
-                "rounded-full bg-white text-black hover:bg-neutral-200 font-semibold px-7 py-3 text-sm shadow-[0_0_24px_rgba(255,255,255,0.25)] transition-all duration-300 hover:scale-105 active:scale-95"
-              )}
-            >
-              Create a Free Account
-              <ArrowRight className="ml-1.5 size-4" />
-            </Link>
-            <Link
-              href="#jobs"
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "rounded-full border-white/20 bg-neutral-900/80 hover:bg-neutral-800 text-white font-medium px-7 py-3 text-sm backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
-              )}
-            >
-              View Job Listing
-            </Link>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
+          <Link
+            href="#create-account"
+            className="rounded-xl bg-white hover:bg-neutral-100 text-black font-semibold px-6 sm:px-7 py-3 text-xs sm:text-sm shadow-lg transition-transform hover:scale-105 active:scale-95"
+          >
+            Create a free account
+          </Link>
+          <Link
+            href="#pricing"
+            className="rounded-xl border border-white/10 bg-[#14151f]/80 hover:bg-[#1a1c29] text-white font-medium px-6 sm:px-7 py-3 text-xs sm:text-sm backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+          >
+            View pricing
+          </Link>
         </div>
       </div>
     </section>

@@ -1,10 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Check, Compass, Zap, Crown, ArrowRight } from "lucide-react"
-import { SectionKicker } from "@/components/shared/section-kicker"
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Crown, BarChart2, Zap, Plus, ArrowRight } from "lucide-react"
 
 export function PricingSection() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
@@ -12,47 +9,45 @@ export function PricingSection() {
   const plans = [
     {
       name: "Starter",
-      icon: Compass,
+      icon: Crown,
       monthlyPrice: 0,
       yearlyPrice: 0,
-      subtitle: "Start building your neighborhood",
+      subtitle: "Start building your insights hub:",
       features: [
-        "Apply up to 5 jobs daily",
-        "Basic company insights",
-        "Standard email support",
-        "Access to public job boards",
+        "Daily AI match brief (top 5)",
+        "Verified salary bands",
+        "Company insight dashboards",
+        "1-click apply, unlimited",
       ],
       ctaText: "Choose This Plan",
       highlighted: false,
     },
     {
       name: "Growth",
-      icon: Zap,
+      icon: BarChart2,
       monthlyPrice: 17,
-      yearlyPrice: 14,
-      subtitle: "Start building your neighborhood",
+      yearlyPrice: 13,
+      subtitle: "Start building your insights hub:",
       features: [
-        "Apply to unlimited jobs daily",
-        "Full company insights",
-        "Priority recruiter application",
-        "Dedicated career advisor",
-        "Resume review & AI optimization",
+        "Daily AI match brief (top 5)",
+        "Verified salary bands",
+        "Company insight dashboards",
+        "1-click apply, unlimited",
       ],
       ctaText: "Choose This Plan",
       highlighted: true,
     },
     {
       name: "Premium",
-      icon: Crown,
+      icon: Zap,
       monthlyPrice: 99,
-      yearlyPrice: 79,
-      subtitle: "Start building your neighborhood",
+      yearlyPrice: 74,
+      subtitle: "Start building your insights hub:",
       features: [
-        "Everything in Growth",
-        "1-on-1 executive mentorship",
-        "Direct hiring manager intros",
-        "Guaranteed interview invites",
-        "Private compensation negotiation",
+        "Everything in Pro",
+        "Multi-profile career portfolios",
+        "Shared talent rooms",
+        "Recruiter view (read-only)",
       ],
       ctaText: "Choose This Plan",
       highlighted: false,
@@ -60,21 +55,29 @@ export function PricingSection() {
   ]
 
   return (
-    <section id="pricing" className="relative w-full py-20 sm:py-28 overflow-hidden">
+    <section id="pricing" className="relative w-full py-20 sm:py-28 overflow-hidden bg-[#050508]">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[550px] bg-indigo-950/20 rounded-full filter blur-[150px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         {/* Section Kicker */}
-        <SectionKicker>PRICING</SectionKicker>
+        <div className="inline-flex items-center justify-center gap-2 mb-4 select-none">
+          <span className="w-1.5 h-1.5 rounded-xs bg-[#5c54f5]" />
+          <span className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-neutral-400">
+            PRICING
+          </span>
+          <span className="w-1.5 h-1.5 rounded-xs bg-[#5c54f5]" />
+        </div>
 
         {/* Section Heading */}
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white text-center mb-8 max-w-2xl leading-tight">
-          Pay for the leverage, not the listings
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white text-center mb-8 sm:mb-10 leading-[1.15]">
+          Pay for the leverage,
+          <br />
+          not the listings
         </h2>
 
         {/* Billing Cycle Pill Switch */}
-        <div className="inline-flex items-center p-1.5 rounded-full border border-white/10 bg-[#0d0e17] backdrop-blur-md mb-14">
+        <div className="inline-flex items-center p-1 rounded-full border border-white/10 bg-[#0d0e17] backdrop-blur-md mb-12 sm:mb-14">
           <button
             type="button"
             onClick={() => setBillingCycle("monthly")}
@@ -96,98 +99,82 @@ export function PricingSection() {
             }`}
           >
             <span>Yearly</span>
-            <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
-              -20%
+            <span className="px-2 py-0.5 rounded-full bg-[#d946ef] text-white text-[10px] font-bold">
+              25%
             </span>
           </button>
         </div>
 
         {/* Pricing Cards Grid (3 cards) */}
-        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div className="w-full max-w-5xl lg:max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           {plans.map((plan) => {
             const Icon = plan.icon
             const price = billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice
 
             return (
-              <Card
+              <div
                 key={plan.name}
-                className={`relative rounded-2xl flex flex-col justify-between p-6 sm:p-8 transition-all duration-300 ${
+                className={`rounded-2xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
                   plan.highlighted
-                    ? "border-indigo-500/60 bg-[#0f111c] shadow-[0_0_40px_rgba(99,102,241,0.18)] scale-[1.02] md:-translate-y-2"
-                    : "border-white/[0.08] bg-[#0c0d14]/80 hover:border-white/20 hover:bg-[#10121d]"
+                    ? "border-white/20 bg-[#0d0e17]/95 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
+                    : "border-white/[0.08] bg-[#0c0d14]/90"
                 }`}
               >
-                {/* Popular Glow Indicator on Highlighted Card */}
-                {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold tracking-wider uppercase shadow-md">
-                    Most Popular
-                  </div>
-                )}
-
                 <div>
-                  <CardHeader className="p-0 mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`size-8 rounded-lg flex items-center justify-center border ${
-                            plan.highlighted
-                              ? "bg-indigo-500/20 border-indigo-500/40 text-indigo-400"
-                              : "bg-white/[0.04] border-white/[0.08] text-neutral-300"
-                          }`}
-                        >
-                          <Icon className="size-4" />
-                        </div>
-                        <span className="font-bold text-white text-base">
-                          {plan.name}
-                        </span>
+                  {/* Top Row: [Icon] PlanName ... $Price /month */}
+                  <div className="flex items-center justify-between mb-6 sm:mb-7">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-8 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-fuchsia-400">
+                        <Icon className="size-4" />
                       </div>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-3xl sm:text-4xl font-extrabold text-white">
-                          ${price}
-                        </span>
-                        <span className="text-xs text-neutral-400">/mo</span>
-                      </div>
+                      <span className="font-bold text-white text-base sm:text-lg tracking-tight">
+                        {plan.name}
+                      </span>
                     </div>
-                    <CardTitle className="text-xs font-normal text-neutral-400">
-                      {plan.subtitle}
-                    </CardTitle>
-                  </CardHeader>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                        ${price}
+                      </span>
+                      <span className="text-xs text-neutral-400 font-normal">
+                        /month
+                      </span>
+                    </div>
+                  </div>
 
-                  <CardContent className="p-0 mb-8">
-                    <ul className="space-y-3">
-                      {plan.features.map((feature, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-2.5 text-xs text-neutral-300 leading-normal"
-                        >
-                          <div className="size-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                            <Check className="size-2.5 text-emerald-400" />
-                          </div>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
+                  {/* Subtitle */}
+                  <p className="text-xs sm:text-sm font-normal text-neutral-300 mb-5">
+                    {plan.subtitle}
+                  </p>
+
+                  {/* Features List with '+' icon */}
+                  <ul className="space-y-3.5 mb-8">
+                    {plan.features.map((feature, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-center gap-2.5 text-xs sm:text-sm text-neutral-400 font-normal"
+                      >
+                        <div className="size-4 rounded bg-white/[0.08] flex items-center justify-center shrink-0 text-neutral-300">
+                          <Plus className="size-2.5" strokeWidth={2.5} />
+                        </div>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <CardFooter className="p-0 pt-4 border-t border-white/[0.06]">
-                  {plan.highlighted ? (
-                    <Button
-                      className="w-full rounded-xl bg-white text-black hover:bg-neutral-200 font-semibold py-2.5 text-xs sm:text-sm tracking-wide shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      {plan.ctaText}
-                      <ArrowRight className="ml-1.5 size-3.5" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/20 text-white font-medium py-2.5 text-xs sm:text-sm transition-colors"
-                    >
-                      {plan.ctaText}
-                    </Button>
-                  )}
-                </CardFooter>
-              </Card>
+                {/* Bottom CTA Button */}
+                <button
+                  type="button"
+                  className={`w-full px-4 sm:px-5 py-3 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between transition-all duration-200 cursor-pointer ${
+                    plan.highlighted
+                      ? "bg-white hover:bg-neutral-200 text-black font-semibold shadow-md active:scale-[0.99]"
+                      : "bg-[#232429] hover:bg-[#2d2f38] text-neutral-200 border border-white/[0.08] active:scale-[0.99]"
+                  }`}
+                >
+                  <span>{plan.ctaText}</span>
+                  <ArrowRight className="size-4" />
+                </button>
+              </div>
             )
           })}
         </div>

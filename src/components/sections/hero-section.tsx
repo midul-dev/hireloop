@@ -43,7 +43,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       }}
-      className="relative w-full pt-28 sm:pt-36 md:pt-40 pb-12 sm:pb-16 md:pb-20 bg-[#050508] flex flex-col items-center overflow-hidden"
+      className="relative w-full pt-28 sm:pt-56 md:pt-60 pb-12 sm:pb-16 md:pb-20 bg-[#050508] flex flex-col items-center overflow-hidden"
     >
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         {/* Top Badge: 💼 50,000+ NEW JOBS THIS MONTH with horizontal line accents */}
@@ -113,7 +113,7 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
         </form>
 
         {/* Trending Position Tags */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-xs mb-16 sm:mb-20 md:mb-24">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-xs mb-16 sm:mb-40 md:mb-44">
           <span className="text-neutral-400 font-normal mr-1">Trending Position</span>
           {trendingTags.map((tag) => (
             <button
