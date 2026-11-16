@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { signIn } from "@/lib/auth-client"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import React, { useState } from "react";
+import Link from "next/link";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { signIn } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -28,49 +28,58 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
       />
     </svg>
-  )
+  );
 }
 
 export default function SignInPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
 
-  const handleSignIn =async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
-  const formData = new FormData(e.currentTarget)
-  const email = formData.get("email") as string
-  const password = formData.get("password") as string
-  const rememberMe = formData.get("rememberMe") ==="on"
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
 
-console.log(email, password, rememberMe)
+  const handleSignIn = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const rememberMe = formData.get("rememberMe") === "on";
 
-    const { data, error } = await signIn.email({
-      email,
-      password,
-      rememberMe,
-    },{
-      
-    onRequest: () => setIsLoading(true),
-    onSuccess: (ctx) => {
-      setIsLoading(false);
-      toast.success(`Welcome back, ${ctx.data.user.name}!`);
-      router.push("/");
-    },
-    onError: (ctx) => {
-      setIsLoading(false);
-      toast.error(ctx.error.message);
-    },
-  
-    })
-  }
+    console.log(email, password, rememberMe);
 
-  const handleGoogleSignIn = () => {
-    // Placeholder for Google OAuth handler
-    console.log("Signing in with Google...")
-  }
+    const { data, error } = await signIn.email(
+      {
+        email,
+        password,
+        rememberMe,
+      },
+      {
+        onRequest: () => setIsLoading(true),
+        onSuccess: (ctx) => {
+          setIsLoading(false);
+          toast.success(`Welcome back, ${ctx.data.user.name}!`);
+          router.push("/");
+        },
+        onError: (ctx) => {
+          setIsLoading(false);
+          toast.error(ctx.error.message);
+        },
+      },
+    );
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsAuth(true);
+    const { error } = await signIn.social({
+      provider: "google",
+      callbackURL: "/",
+      newUserCallbackURL: "/onboarding",
+    });
+    if (error) {
+      setIsAuth(false);
+      toast.error(error.message || "Google sign-in failed!");
+    }
+  };
 
   return (
     <div className="w-full max-w-[420px] rounded-2xl border border-white/[0.08] bg-[#0c0d14]/85 backdrop-blur-xl p-6 sm:p-8 shadow-[0_16px_50px_rgba(0,0,0,0.7)]">
@@ -88,10 +97,17 @@ console.log(email, password, rememberMe)
       <button
         type="button"
         onClick={handleGoogleSignIn}
+        disabled={isAuth}
         className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 text-white flex items-center justify-center gap-3 font-medium text-sm transition-all duration-200 active:scale-[0.99] cursor-pointer shadow-sm"
       >
-        <GoogleIcon />
-        <span>Continue with Google</span>
+        {isAuth ? (
+          <div className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          <>
+            <GoogleIcon />
+            <span>Continue with Google</span>
+          </>
+        )}
       </button>
 
       {/* Divider */}
@@ -150,7 +166,11 @@ console.log(email, password, rememberMe)
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
         </div>
@@ -163,7 +183,10 @@ console.log(email, password, rememberMe)
             name="rememberMe"
             className="size-4 rounded border-white/20 bg-white/[0.04] text-[#5c54f5] focus:ring-[#5c54f5]/40 accent-[#5c54f5] cursor-pointer"
           />
-          <label htmlFor="remember" className="text-xs text-neutral-400 select-none cursor-pointer">
+          <label
+            htmlFor="remember"
+            className="text-xs text-neutral-400 select-none cursor-pointer"
+          >
             Remember me for 30 days
           </label>
         </div>
@@ -198,5 +221,5 @@ console.log(email, password, rememberMe)
         </p>
       </div>
     </div>
-  )
+  );
 }

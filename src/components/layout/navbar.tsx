@@ -5,15 +5,28 @@ import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { Logo } from "@/components/shared/logo"
 import { Button } from "@/components/ui/button"
+import { signOut, useSession } from "@/lib/auth-client"
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const { 
+        data: session, 
+        isPending, 
+        error, 
+    } = useSession() 
+    
+    const user = session?.user
 
   const navLinks = [
     { label: "Browse Jobs", href: "#jobs" },
     { label: "Company", href: "#features" },
     { label: "Pricing", href: "#pricing" },
   ]
+
+  const handleSignOut =async ()=>{
+    await signOut();
+  }
 
   return (
     <header className="sticky top-3 sm:top-5 z-50 w-full px-4 sm:px-6 lg:px-8 -mb-16 sm:-mb-20 pointer-events-none">
@@ -38,21 +51,27 @@ export function Navbar() {
           {/* Divider */}
           <div className="h-4 w-px bg-white/20" />
 
-          {/* Sign In (soft purple matching reference design) */}
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium text-[#8c82ff] hover:text-[#a59eff] transition-colors"
-          >
-            Sign In
-          </Link>
+        {user ? (
+  <button onClick={handleSignOut}>Logout</button>
+) : (
+  <>
+    {/* Sign In (soft purple matching reference design) */}
+    <Link
+      href="/sign-in"
+      className="text-sm font-medium text-[#8c82ff] hover:text-[#a59eff] transition-colors"
+    >
+      Sign In
+    </Link>
 
-          {/* Get Started Button */}
-          <Link
-            href="/sign-up"
-            className="rounded-xl bg-[#5c54f5] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 sm:px-5 sm:py-2 text-sm shadow-[0_0_20px_rgba(92,84,245,0.4)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Get Started
-          </Link>
+    {/* Get Started Button */}
+    <Link
+      href="/sign-up"
+      className="rounded-xl bg-[#5c54f5] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 sm:px-5 sm:py-2 text-sm shadow-[0_0_20px_rgba(92,84,245,0.4)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+    >
+      Get Started
+    </Link>
+  </>
+)}
         </div>
 
         {/* Mobile menu button */}

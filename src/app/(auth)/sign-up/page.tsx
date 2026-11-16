@@ -17,7 +17,7 @@ import {
   Check,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { signUp } from "@/lib/auth-client";
+import { signIn, signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -82,6 +82,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuth, setIsAuth] = useState(false)
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -135,9 +136,20 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log("Signing up with Google...");
-  };
+  
+
+  const handleGoogleSignIn = async () => {
+      setIsAuth(true);
+      const { error } = await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+        newUserCallbackURL: "/onboarding",
+      });
+      if (error) {
+        setIsAuth(false);
+        toast.error(error.message || "Google sign-in failed!");
+      }
+    };
 
   return (
     <div className="w-full max-w-[440px] rounded-2xl border border-white/[0.08] bg-[#0c0d14]/85 backdrop-blur-xl p-6 sm:p-8 shadow-[0_16px_50px_rgba(0,0,0,0.7)]">
