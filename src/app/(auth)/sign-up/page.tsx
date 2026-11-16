@@ -43,7 +43,7 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-type Role = "Seeker" | "Recruiter" | "admin";
+type Role = "seeker" | "recruiter" | "admin";
 
 interface RoleOption {
   value: Role;
@@ -54,13 +54,13 @@ interface RoleOption {
 
 const roleOptions: RoleOption[] = [
   {
-    value: "Seeker",
+    value: "seeker",
     label: "Seeker",
     description: "Looking for jobs & opportunities",
     icon: Briefcase,
   },
   {
-    value: "Recruiter",
+    value: "recruiter",
     label: "Recruiter",
     description: "Hiring & posting jobs",
     icon: Building2,
@@ -75,7 +75,7 @@ const roleOptions: RoleOption[] = [
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [role, setRole] = useState<Role>("Seeker");
+  const [role, setRole] = useState<Role>("seeker");
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

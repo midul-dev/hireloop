@@ -5,8 +5,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutGrid,
+  Users,
+  Building2,
   Briefcase,
+  Bookmark,
   FileText,
+  Banknote,
   Settings,
   LogOut,
   User,
@@ -17,14 +21,14 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { Logo } from "@/components/shared/logo"
 import { useSession, signOut } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+
+type Role = "admin" | "recruiter" | "seeker"
 
 interface NavItem {
   title: string
@@ -32,53 +36,141 @@ interface NavItem {
   icon: React.ElementType
 }
 
-const navItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    url: "/dashboard/recruiter",
-    icon: LayoutGrid,
-  },
-  {
-    title: "Manage Jobs",
-    url: "/dashboard/manage-jobs",
-    icon: Briefcase,
-  },
-  {
-    title: "Applications",
-    url: "/dashboard/applications",
-    icon: FileText,
-  },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
-]
+// Role-based dynamic menus as per reference images
+const roleMenus: Record<Role, NavItem[]> = {
+  // 1. Admin Menu (Ref Image 1): Dashboard, Users, Companies, Jobs, Payments, Settings
+  admin: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/admin",
+      icon: LayoutGrid,
+    },
+    {
+      title: "Users",
+      url: "/dashboard/admin/users",
+      icon: Users,
+    },
+    {
+      title: "Companies",
+      url: "/dashboard/admin/companies",
+      icon: Building2,
+    },
+    {
+      title: "Jobs",
+      url: "/dashboard/admin/jobs",
+      icon: Briefcase,
+    },
+    {
+      title: "Payments",
+      url: "/dashboard/admin/payments",
+      icon: Banknote,
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/admin/settings",
+      icon: Settings,
+    },
+  ],
+
+  // 2. Seeker Menu (Ref Image 2): Dashboard, Jobs, Saved Jobs, Applications, Billing, Settings
+  seeker: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/seeker",
+      icon: LayoutGrid,
+    },
+    {
+      title: "Jobs",
+      url: "/dashboard/seeker/jobs",
+      icon: Briefcase,
+    },
+    {
+      title: "Saved Jobs",
+      url: "/dashboard/seeker/saved-jobs",
+      icon: Bookmark,
+    },
+    {
+      title: "Applications",
+      url: "/dashboard/seeker/applications",
+      icon: FileText,
+    },
+    {
+      title: "Billing",
+      url: "/dashboard/seeker/billing",
+      icon: Banknote,
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/seeker/settings",
+      icon: Settings,
+    },
+  ],
+
+  // 3. Recruiter Menu (Ref Image 3): Dashboard, Manage Jobs, Applications, Settings
+  recruiter: [
+    {
+      title: "Dashboard",
+      url: "/dashboard/recruiter",
+      icon: LayoutGrid,
+    },
+    {
+      title: "Manage Jobs",
+      url: "/dashboard/recruiter/jobs",
+      icon: Briefcase,
+    },
+    {
+      title: "Applications",
+      url: "/dashboard/recruiter/applications",
+      icon: FileText,
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/recruiter/settings",
+      icon: Settings,
+    },
+  ],
+}
+
+const normalizeRole = (role?: string | null): Role => {
+  const r = role?.toLowerCase().trim()
+  if (r === "admin") return "admin"
+  if (r === "recruiter") return "recruiter"
+  return "seeker"
+}
 
 const DashboardSidebar = () => {
   const pathname = usePathname() || ""
   const { data: session } = useSession()
   const user = session?.user
 
-  // Fallback to role-specific dashboard if applicable
-  const getDashboardUrl = () => {
-    if (pathname.startsWith("/dashboard/seeker")) return "/dashboard/seeker"
-    if (pathname.startsWith("/dashboard/admin")) return "/dashboard/admin"
-    return "/dashboard/recruiter"
+  // Detect role dynamically from the current route first, then fallback to session user role
+  let currentRole: Role = "recruiter"
+
+  if (pathname.startsWith("/dashboard/admin")) {
+    currentRole = "admin"
+  } else if (pathname.startsWith("/dashboard/seeker")) {
+    currentRole = "seeker"
+  } else if (pathname.startsWith("/dashboard/recruiter")) {
+    currentRole = "recruiter"
+  } else if (user?.role) {
+    currentRole = normalizeRole(user.role as string)
   }
+
+  const currentNavItems = roleMenus[currentRole] || roleMenus.recruiter
 
   const isItemActive = (item: NavItem) => {
     if (item.title === "Dashboard") {
+      const otherItems = currentNavItems.filter((i) => i.title !== "Dashboard")
+      const isOtherActive = otherItems.some(
+        (other) => pathname === other.url || pathname.startsWith(other.url + "/")
+      )
       return (
-        pathname === "/dashboard" ||
-        pathname === "/dashboard/recruiter" ||
-        pathname === "/dashboard/seeker" ||
-        pathname === "/dashboard/admin" ||
         pathname === item.url ||
-        !navItems.slice(1).some((other) => pathname.startsWith(other.url))
+        pathname === "/dashboard" ||
+        !isOtherActive
       )
     }
-    return pathname.startsWith(item.url)
+    return pathname === item.url || pathname.startsWith(item.url + "/")
   }
 
   const handleSignOut = async () => {
@@ -97,30 +189,21 @@ const DashboardSidebar = () => {
         } as React.CSSProperties
       }
     >
-      {/* Brand Header */}
-      <SidebarHeader className="h-16 border-b border-white/[0.06] flex items-center justify-center px-4">
-        <div className="w-full flex items-center justify-between">
-          <Logo size="sm" />
-        </div>
-      </SidebarHeader>
-
-      {/* Main Navigation Menu */}
-      <SidebarContent className="px-3 py-4">
+      {/* Menu Only (No Head) */}
+      <SidebarContent className="px-3 pt-6 pb-4">
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1.5">
-              {navItems.map((item) => {
+              {currentNavItems.map((item) => {
                 const Icon = item.icon
                 const active = isItemActive(item)
-                const targetUrl =
-                  item.title === "Dashboard" ? getDashboardUrl() : item.url
 
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       render={
                         <Link
-                          href={targetUrl}
+                          href={item.url}
                           className={cn(
                             "relative flex items-center gap-3.5 w-full h-11 px-3.5 rounded-xl text-sm font-medium transition-all duration-150 select-none group",
                             active
@@ -154,7 +237,7 @@ const DashboardSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Sidebar Footer with User / Logout */}
+      {/* Bottom Footer (User / Logout) */}
       <SidebarFooter className="border-t border-white/[0.06] p-3">
         {user ? (
           <div className="flex items-center justify-between p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
@@ -181,7 +264,7 @@ const DashboardSidebar = () => {
           </div>
         ) : (
           <div className="px-2 py-1 flex items-center justify-between text-xs text-neutral-400">
-            <span>HireLoop v1.0</span>
+            <span className="capitalize">{currentRole} Portal</span>
             <Link
               href="/"
               className="text-[#8c82ff] hover:underline"

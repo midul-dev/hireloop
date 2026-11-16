@@ -22,6 +22,7 @@ export function Navbar() {
     { label: "Browse Jobs", href: "#jobs" },
     { label: "Company", href: "#features" },
     { label: "Pricing", href: "#pricing" },
+    { label: "Dashboard", href:`/dashboard/${user?.role}` },
   ]
 
   const handleSignOut =async ()=>{

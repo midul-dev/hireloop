@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [role, setRole] = useState<"Seeker" | "Recruiter" | "Admin">("Seeker");
+  const [role, setRole] = useState<"seeker" | "recruiter" | "admin">("seeker");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSaveRole = async () => {
@@ -30,7 +30,7 @@ export default function OnboardingPage() {
     <div className="max-w-md mx-auto mt-20 p-6 rounded-2xl border border-white/10 bg-[#0c0d14] text-white space-y-4">
       <h1 className="text-xl font-bold">Choose your account type</h1>
       <div className="grid grid-cols-3 gap-3">
-        {(["Admin", "Seeker", "Recruiter"] as const).map((item) => (
+        {(["admin", "seeker", "recruiter"] as const).map((item) => (
           <button
             key={item}
             type="button"
