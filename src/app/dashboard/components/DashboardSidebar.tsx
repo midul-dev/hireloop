@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut,
   User,
+  PlusCircleIcon,
 } from "lucide-react"
 import {
   Sidebar,
@@ -112,6 +113,12 @@ const roleMenus: Record<Role, NavItem[]> = {
       title: "Dashboard",
       url: "/dashboard/recruiter",
       icon: LayoutGrid,
+    },
+    {
+      title: "Add Jobs",
+      url: "/dashboard/recruiter/add-jobs",
+      icon: PlusCircleIcon,
+
     },
     {
       title: "Manage Jobs",
