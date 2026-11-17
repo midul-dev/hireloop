@@ -36,9 +36,9 @@ interface NavItem {
   icon: React.ElementType
 }
 
-// Role-based dynamic menus as per reference images
+// Role-based dynamic menus 
 const roleMenus: Record<Role, NavItem[]> = {
-  // 1. Admin Menu (Ref Image 1): Dashboard, Users, Companies, Jobs, Payments, Settings
+  // 1. Admin Menu : Dashboard, Users, Companies, Jobs, Payments, Settings
   admin: [
     {
       title: "Dashboard",
@@ -131,7 +131,7 @@ const roleMenus: Record<Role, NavItem[]> = {
   ],
 }
 
-const normalizeRole = (role?: string | null): Role => {
+const normalizeRole = (role?: string | "seeker"): Role => {
   const r = role?.toLowerCase().trim()
   if (r === "admin") return "admin"
   if (r === "recruiter") return "recruiter"
@@ -143,20 +143,11 @@ const DashboardSidebar = () => {
   const { data: session } = useSession()
   const user = session?.user
 
-  // Detect role dynamically from the current route first, then fallback to session user role
-  let currentRole: Role = "recruiter"
+  const currentRole = normalizeRole(user?.role as string)
 
-  if (pathname.startsWith("/dashboard/admin")) {
-    currentRole = "admin"
-  } else if (pathname.startsWith("/dashboard/seeker")) {
-    currentRole = "seeker"
-  } else if (pathname.startsWith("/dashboard/recruiter")) {
-    currentRole = "recruiter"
-  } else if (user?.role) {
-    currentRole = normalizeRole(user.role as string)
-  }
+ 
 
-  const currentNavItems = roleMenus[currentRole] || roleMenus.recruiter
+  const currentNavItems = roleMenus[currentRole] || roleMenus.seeker
 
   const isItemActive = (item: NavItem) => {
     if (item.title === "Dashboard") {
