@@ -20,7 +20,7 @@ import {
 import { toast } from "sonner"
 import { getJobs } from "@/lib/actions"
 import { IJobs } from "@/types/jobTypes"
-import JobsRow from "../../components/JobsRow"
+import JobsRow from "../../components/recruiter/JobsRow"
 
 
 export default async function ManageJobPage() {

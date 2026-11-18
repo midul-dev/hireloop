@@ -4,6 +4,7 @@ import { formatTimeAgo, getCategoryStyle } from "@/lib/jobHealper";
 import { IJobs } from "@/types/jobTypes";
 import { ChevronRight, Globe, MapPin, MoreVertical, Pencil, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
+import { DeleteJobs } from "./DeleteDialog";
 
 const JobsRow = ({jobs}: {jobs:IJobs[]}) => {
 
@@ -11,15 +12,7 @@ const JobsRow = ({jobs}: {jobs:IJobs[]}) => {
  
 
   // Handle job deletion
-//   const handleDelete = async (id: string, title: string) => {
-//     try {
-//       await fetch(`/api/jobs?id=${id}`, { method: "DELETE" })
-//     } catch (e) {
-//       console.warn("API delete failed, removing locally:", e)
-//     }
-//     setJobs((prev) => prev.filter((j) => j.id !== id))
-//     toast.success(`"${title}" has been removed.`)
-//   }
+
 
   // Handle quick update save
 //   const handleSaveUpdate = (e: React.FormEvent) => {
@@ -205,13 +198,7 @@ const { icon: CategoryIcon, bg, text } = getCategoryStyle(job.category)
                       </button>
 
                       {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="size-8 rounded-xl bg-white/[0.04] hover:bg-red-500/15 border border-white/[0.08] hover:border-red-500/30 text-neutral-400 hover:text-red-400 flex items-center justify-center transition-colors cursor-pointer"
-                        title="Delete job"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
+                      <DeleteJobs job={job} />
 
                       {/* More Menu */}
                       <button
