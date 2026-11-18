@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { MongoClient } from "mongodb"
+import { MongoClient, ObjectId } from "mongodb"
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,21 +29,21 @@ export async function POST(req: NextRequest) {
 
     const formattedSalary =
       salaryMin && salaryMax
-        ? `${salaryCurrency} ${salaryMin} - ${salaryCurrency} ${salaryMax} ${frequency}`
+        ? `${salaryCurrency}${salaryMin} – ${salaryCurrency}${salaryMax} / ${frequency.replace("per ", "").replace("hour", "hr").replace("year", "yr")}`
         : salaryMin
-        ? `${salaryCurrency} ${salaryMin} ${frequency}`
+        ? `${salaryCurrency}${salaryMin} / ${frequency}`
         : "Competitive"
 
     const newJob = {
       title,
-      company: company || "HireLoop Network",
+      company: company || "HirePulse Network",
       category,
       jobType,
       type: jobType,
       isRemote,
       workplaceType: isRemote ? "Remote" : "On-site",
-      location: location || (isRemote ? "Remote Worldwide" : "Not specified"),
-      deadline,
+      location: location || (isRemote ? "Remote (New York, USA)" : "Not specified"),
+      deadline: deadline || "May 30, 2025",
       salary: formattedSalary,
       salaryMin,
       salaryMax,
@@ -52,8 +52,9 @@ export async function POST(req: NextRequest) {
       responsibilities,
       requirements,
       description: responsibilities || requirements || "Job listing on HireLoop",
+      candidatesCount: Math.floor(Math.random() * 25) + 10,
       createdAt: new Date().toISOString(),
-      status: "active",
+      status: "Active",
     }
 
     console.log("Saving job via FormData API:", newJob)
@@ -100,6 +101,34 @@ export async function GET() {
     return NextResponse.json({ success: true, jobs: [] })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to fetch jobs"
+    return NextResponse.json({ success: false, error: message }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id")
+
+    if (id && process.env.DB_URI) {
+      try {
+        const client = new MongoClient(process.env.DB_URI)
+        await client.connect()
+        const db = client.db("hireloop")
+        if (ObjectId.isValid(id)) {
+          await db.collection("jobs").deleteOne({ _id: new ObjectId(id) })
+        } else {
+          await db.collection("jobs").deleteOne({ id })
+        }
+        await client.close()
+      } catch (dbErr) {
+        console.error("MongoDB delete error:", dbErr)
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "Job deleted successfully" })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to delete job"
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

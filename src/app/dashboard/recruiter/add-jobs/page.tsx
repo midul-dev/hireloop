@@ -15,24 +15,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createJob } from "@/lib/actions";
+import { IJobsFromForm } from "@/types/jobTypes";
 
 type JobType = "Full-time" | "Part-time" | "Contract" | "Internship";
 
-export interface jobformData {
-  title: string,
-  company: string,
-  category: string,
-  jobType: string,
-  isRemote: string,
-  location: string,
-  deadline: string,
-  salaryMin: string,
-  salaryCurrency: string,
-  salaryMax: string,
-  frequency: string,
-  responsibilities: string,
-  requirements: string,
-}
+
 
 export default function AddJobsPage() {
   const router = useRouter();
@@ -54,7 +41,7 @@ export default function AddJobsPage() {
     formData.set("jobType", jobType);
     formData.set("isRemote", isRemote ? "true" : "false");
 
-    const newJob = Object.fromEntries(formData.entries());
+    const newJob: IJobsFromForm = Object.fromEntries(formData.entries());
     console.log("Job Post Data collected via FormData API:", newJob);
 
     try {
