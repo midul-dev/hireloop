@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Building2,
   MapPin,
@@ -12,73 +12,81 @@ import {
   ArrowRight,
   ChevronRight,
   CheckCircle2,
-} from "lucide-react"
-import { toast } from "sonner"
+} from "lucide-react";
+import { toast } from "sonner";
+import { createJob } from "@/lib/actions";
 
-type JobType = "Full-time" | "Part-time" | "Contract" | "Internship"
+type JobType = "Full-time" | "Part-time" | "Contract" | "Internship";
+
+export interface jobformData {
+  title: string,
+  company: string,
+  category: string,
+  jobType: string,
+  isRemote: string,
+  location: string,
+  deadline: string,
+  salaryMin: string,
+  salaryCurrency: string,
+  salaryMax: string,
+  frequency: string,
+  responsibilities: string,
+  requirements: string,
+}
 
 export default function AddJobsPage() {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [jobType, setJobType] = useState<JobType>("Full-time")
-  const [isRemote, setIsRemote] = useState<boolean>(true)
-  const [success, setSuccess] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [jobType, setJobType] = useState<JobType>("Full-time");
+  const [isRemote, setIsRemote] = useState<boolean>(true);
+  const [success, setSuccess] = useState(false);
 
   // Handle form submission using native FormData API method
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     // 1. Collect form data using the FormData API method
-    const form = e.currentTarget
-    const formData = new FormData(form)
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
     // Explicitly ensure dynamic state values are present in formData
-    formData.set("jobType", jobType)
-    formData.set("isRemote", isRemote ? "true" : "false")
+    formData.set("jobType", jobType);
+    formData.set("isRemote", isRemote ? "true" : "false");
 
-    // Log collected FormData entries to console
-    const collectedData: Record<string, string> = {}
-    formData.forEach((value, key) => {
-      collectedData[key] = value.toString()
-    })
-    console.log("Job Post Data collected via FormData API:", collectedData)
+    const newJob = Object.fromEntries(formData.entries());
+    console.log("Job Post Data collected via FormData API:", newJob);
 
     try {
-      const response = await fetch("/api/jobs", {
-        method: "POST",
-        body: formData, // passing native FormData directly to API
-      })
+      
 
-      const result = await response.json()
+      const result = await createJob(newJob)
+      console.log(result)
 
-      if (result.success) {
+      if (result.acknowledged) {
         toast.success("Job posted successfully!", {
-          description: `${collectedData.title || "Job"} has been published to HireLoop.`,
-        })
-        setSuccess(true)
-        // Optionally redirect after short delay
-        setTimeout(() => {
-          router.push("/dashboard/recruiter/jobs")
-        }, 1500)
+          description: `${newJob.title || "Job"} has been published to HireLoop.`,
+        });
+        setSuccess(true);
+        router.push("/dashboard/recruiter/jobs");
       } else {
-        toast.error(result.error || "Failed to post job. Please try again.")
+        toast.error(result.error || "Failed to post job. Please try again.");
       }
     } catch (err: unknown) {
-      console.error("Submission error:", err)
-      toast.success("Job posted successfully!")
-      setSuccess(true)
+      console.error("Submission error:", err);
+      toast.success("Job posted successfully!");
+      setSuccess(true);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const jobTypeOptions: JobType[] = [
     "Full-time",
     "Part-time",
     "Contract",
     "Internship",
-  ]
+  ];
 
   return (
     <div className="max-w-4xl mx-auto pb-20 space-y-7">
@@ -112,7 +120,9 @@ export default function AddJobsPage() {
                 Manage Jobs
               </Link>
               <ChevronRight className="size-3 text-neutral-600" />
-              <span className="text-[#8c82ff] font-medium">Create New Listing</span>
+              <span className="text-[#8c82ff] font-medium">
+                Create New Listing
+              </span>
             </div>
 
             {/* Title */}
@@ -122,7 +132,8 @@ export default function AddJobsPage() {
 
             {/* Subtitle */}
             <p className="text-xs sm:text-sm text-neutral-400">
-              Fill in the position specifications to attract qualified talent across our network.
+              Fill in the position specifications to attract qualified talent
+              across our network.
             </p>
           </div>
 
@@ -167,7 +178,6 @@ export default function AddJobsPage() {
                 type="text"
                 name="title"
                 required
-                defaultValue="Frontend Developer"
                 placeholder="e.g. Frontend Developer"
                 className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
               />
@@ -186,7 +196,6 @@ export default function AddJobsPage() {
                     type="text"
                     name="company"
                     required
-                    defaultValue="HirePulse Network"
                     placeholder="e.g. HirePulse Network"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -202,22 +211,36 @@ export default function AddJobsPage() {
                   <select
                     name="category"
                     required
-                    defaultValue="Engineering & Tech"
                     className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors appearance-none cursor-pointer"
                   >
-                    <option value="Engineering & Tech" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="Engineering & Tech"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       Engineering & Tech
                     </option>
-                    <option value="Product & Design" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="Product & Design"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       Product & Design
                     </option>
-                    <option value="Marketing & Growth" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="Marketing & Growth"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       Marketing & Growth
                     </option>
-                    <option value="Sales & Operations" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="Sales & Operations"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       Sales & Operations
                     </option>
-                    <option value="Customer Success" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="Customer Success"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       Customer Success
                     </option>
                   </select>
@@ -234,7 +257,7 @@ export default function AddJobsPage() {
               <input type="hidden" name="jobType" value={jobType} />
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
                 {jobTypeOptions.map((type) => {
-                  const isSelected = jobType === type
+                  const isSelected = jobType === type;
                   return (
                     <button
                       key={type}
@@ -248,7 +271,7 @@ export default function AddJobsPage() {
                     >
                       {type}
                     </button>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -282,7 +305,11 @@ export default function AddJobsPage() {
               </div>
 
               {/* Toggle Switch */}
-              <input type="hidden" name="isRemote" value={isRemote ? "true" : "false"} />
+              <input
+                type="hidden"
+                name="isRemote"
+                value={isRemote ? "true" : "false"}
+              />
               <button
                 type="button"
                 role="switch"
@@ -316,7 +343,6 @@ export default function AddJobsPage() {
                     type="text"
                     name="location"
                     required
-                    defaultValue="New York, USA"
                     placeholder="New York, USA"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -333,7 +359,6 @@ export default function AddJobsPage() {
                   <input
                     type="text"
                     name="deadline"
-                    defaultValue="05/30/2025"
                     placeholder="05/30/2025"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -375,7 +400,6 @@ export default function AddJobsPage() {
                   <input
                     type="text"
                     name="salaryMax"
-                    defaultValue="40"
                     placeholder="40"
                     className="w-full h-11 pl-8 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -390,16 +414,24 @@ export default function AddJobsPage() {
                 <div className="relative">
                   <select
                     name="frequency"
-                    defaultValue="per hour"
                     className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors appearance-none cursor-pointer"
                   >
-                    <option value="per hour" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="per hour"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       per hour
                     </option>
-                    <option value="per month" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="per month"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       per month
                     </option>
-                    <option value="per year" className="bg-[#0e0f17] text-white">
+                    <option
+                      value="per year"
+                      className="bg-[#0e0f17] text-white"
+                    >
                       per year
                     </option>
                   </select>
@@ -429,7 +461,6 @@ export default function AddJobsPage() {
                 name="responsibilities"
                 required
                 rows={4}
-                defaultValue="Showcase your commitment to delivering exceptional user interfaces and digital experiences. You will collaborate directly with systems designers and backend engineers to craft responsive, micro-interaction rich products."
                 placeholder="Showcase your commitment to delivering exceptional user interfaces..."
                 className="w-full rounded-xl border border-white/10 bg-[#0e0f17] p-3.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors resize-y min-h-[100px] leading-relaxed"
               />
@@ -438,13 +469,13 @@ export default function AddJobsPage() {
             {/* Qualifications & Requirements */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-neutral-300">
-                Qualifications & Requirements <span className="text-[#5c54f5]">*</span>
+                Qualifications & Requirements{" "}
+                <span className="text-[#5c54f5]">*</span>
               </label>
               <textarea
                 name="requirements"
                 required
                 rows={5}
-                defaultValue={`• 3+ years of experience with React, TypeScript, and modern state architectures\n• Solid understanding of DOM performance and component-driven designs\n• Experience partnering closely with product teams and UI/UX designers`}
                 placeholder="• 3+ years of experience with React..."
                 className="w-full rounded-xl border border-white/10 bg-[#0e0f17] p-3.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors resize-y min-h-[120px] leading-relaxed"
               />
@@ -474,5 +505,5 @@ export default function AddJobsPage() {
         </div>
       </form>
     </div>
-  )
+  );
 }
