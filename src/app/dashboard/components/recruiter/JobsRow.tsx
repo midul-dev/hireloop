@@ -228,14 +228,14 @@ const JobsRow = ({ jobs = [] }: { jobs?: IJobs[] }) => {
                       <td className="py-4 px-5 align-middle text-right">
                         <div className="flex items-center justify-end gap-2">
                           {/* Update Button */}
-                          <button
-                            type="button"
+                          <Link
+                            href={`/dashboard/recruiter/jobs/update-jobs/${job._id}`}
                             className="h-8 px-3 rounded-xl bg-[#5c54f5]/15 hover:bg-[#5c54f5]/25 border border-[#5c54f5]/30 text-[#c7d2fe] hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                             title="Update job"
                           >
                             <Pencil className="size-3.5" />
                             <span>Update</span>
-                          </button>
+                          </Link>
 
                           {/* Delete Button */}
                           <DeleteJobs job={job} />

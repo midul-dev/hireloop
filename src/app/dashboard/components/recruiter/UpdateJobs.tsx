@@ -1,14 +1,147 @@
-import React from 'react';
+"use client";
 
-const UpdateJobs = () => {
+import React, { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Building2,
+  MapPin,
+  Calendar,
+  Globe,
+  ChevronDown,
+  ArrowRight,
+  ChevronRight,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { updateJob } from "@/lib/actions";
+import { IJobs, IJobsFromForm } from "@/types/jobTypes";
 
-    const handleUpdate=async () => {
+type JobType = "Full-time" | "Part-time" | "Contract" | "Internship";
 
+interface UpdateJobsProps {
+  job?: IJobs;
+  jobId?: string;
+}
+
+export default function UpdateJobsContent({ job, jobId }: UpdateJobsProps) {
+  const router = useRouter();
+
+  const [currentJob, setCurrentJob] = useState<IJobs | undefined>(job);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [jobType, setJobType] = useState<JobType>(
+    (job?.jobType as JobType) || "Full-time"
+  );
+  const [isRemote, setIsRemote] = useState<boolean>(
+    job?.isRemote ? String(job.isRemote).toLowerCase() === "true" : true
+  );
+  const [success, setSuccess] = useState<boolean>(false);
+
+  const targetId = job?._id || jobId || currentJob?._id;
+
+  useEffect(() => {
+    if (job) {
+      setCurrentJob(job);
+      if (job.jobType) setJobType(job.jobType as JobType);
+      if (job.isRemote !== undefined) {
+        setIsRemote(String(job.isRemote).toLowerCase() === "true");
+      }
+    } else if (jobId) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/job/${jobId}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && data._id) {
+            setCurrentJob(data);
+            if (data.jobType) setJobType(data.jobType as JobType);
+            if (data.isRemote !== undefined) {
+              setIsRemote(String(data.isRemote).toLowerCase() === "true");
+            }
+          }
+        })
+        .catch((err) => console.error("Error loading job:", err));
+    }
+  }, [job, jobId]);
+
+  // Handle form submission using FormData API
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Explicitly set dynamic values
+    formData.set("jobType", jobType);
+    formData.set("isRemote", isRemote ? "true" : "false");
+
+    const updatedJob: IJobsFromForm = Object.fromEntries(formData.entries());
+    const finalId = targetId || currentJob?._id || job?._id || jobId;
+
+    if (!finalId) {
+      toast.error("Job ID not found. Unable to update.");
+      setIsSubmitting(false);
+      return;
     }
 
-    return (
-        <div>
-            <form id="add-job-form" onSubmit={handleSubmit} className="space-y-8">
+    try {
+      const result = await updateJob(finalId, updatedJob);
+
+      if (
+        result.ok ||
+        result.acknowledged ||
+        result.matchedCount > 0 ||
+        result.modifiedCount !== undefined
+      ) {
+        toast.success("Job updated successfully!");
+        setSuccess(true);
+        router.push("/dashboard/recruiter/jobs");
+        router.refresh();
+      } else {
+        toast.error(result.message || result.error || "Failed to update job!");
+      }
+    } catch {
+      toast.error("Something went wrong!");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const jobTypeOptions: JobType[] = [
+    "Full-time",
+    "Part-time",
+    "Contract",
+    "Internship",
+  ];
+
+
+
+  return (
+    <div className="max-w-4xl mx-auto pb-20 space-y-7">
+      {/* Success Banner */}
+      {success && (
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 text-emerald-400 text-sm animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="size-5 shrink-0" />
+            <span>Job updated and published successfully! Redirecting...</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccess(false)}
+            className="text-xs underline underline-offset-4 hover:text-emerald-300 cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Main Form Wrapping Header & Sections */}
+      <form
+        key={currentJob?._id || "job-form"}
+        id="update-job-form"
+        onSubmit={handleUpdate}
+        className="space-y-8"
+      >
         {/* Top Header Row matching Reference Image */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
           <div className="space-y-1">
@@ -22,23 +155,22 @@ const UpdateJobs = () => {
               </Link>
               <ChevronRight className="size-3 text-neutral-600" />
               <span className="text-[#8c82ff] font-medium">
-                Create New Listing
+                Update Listing
               </span>
             </div>
 
             {/* Title */}
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              Post a New Job
+              Update Job Post
             </h1>
 
             {/* Subtitle */}
             <p className="text-xs sm:text-sm text-neutral-400">
-              Fill in the position specifications to attract qualified talent
-              across our network.
+              Update position specifications, compensation, or requirements across your organization.
             </p>
           </div>
 
-          {/* Top Right Publish Button */}
+          {/* Top Right Save Button */}
           <div className="shrink-0">
             <button
               type="submit"
@@ -48,11 +180,11 @@ const UpdateJobs = () => {
               {isSubmitting ? (
                 <>
                   <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Publishing...</span>
+                  <span>Updating...</span>
                 </>
               ) : (
                 <>
-                  <span>Publish Job</span>
+                  <span>Save Changes</span>
                   <ArrowRight className="size-4" />
                 </>
               )}
@@ -79,6 +211,7 @@ const UpdateJobs = () => {
                 type="text"
                 name="title"
                 required
+                defaultValue={currentJob?.title || ""}
                 placeholder="e.g. Frontend Developer"
                 className="w-full h-11 px-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
               />
@@ -97,6 +230,7 @@ const UpdateJobs = () => {
                     type="text"
                     name="company"
                     required
+                    defaultValue={currentJob?.company || ""}
                     placeholder="e.g. HirePulse Network"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -112,6 +246,7 @@ const UpdateJobs = () => {
                   <select
                     name="category"
                     required
+                    defaultValue={currentJob?.category || "Engineering & Tech"}
                     className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors appearance-none cursor-pointer"
                   >
                     <option
@@ -244,6 +379,7 @@ const UpdateJobs = () => {
                     type="text"
                     name="location"
                     required
+                    defaultValue={currentJob?.location || ""}
                     placeholder="New York, USA"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -260,6 +396,7 @@ const UpdateJobs = () => {
                   <input
                     type="text"
                     name="deadline"
+                    defaultValue={currentJob?.deadline || ""}
                     placeholder="05/30/2025"
                     className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -276,16 +413,20 @@ const UpdateJobs = () => {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-sm pointer-events-none">
-                    €
+                    {currentJob?.salaryCurrency || "€"}
                   </span>
                   <input
                     type="text"
                     name="salaryMin"
-                    defaultValue="25"
+                    defaultValue={currentJob?.salaryMin || "25"}
                     placeholder="25"
                     className="w-full h-11 pl-8 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
-                  <input type="hidden" name="salaryCurrency" value="€" />
+                  <input
+                    type="hidden"
+                    name="salaryCurrency"
+                    value={currentJob?.salaryCurrency || "€"}
+                  />
                 </div>
               </div>
 
@@ -296,11 +437,12 @@ const UpdateJobs = () => {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-medium text-sm pointer-events-none">
-                    €
+                    {currentJob?.salaryCurrency || "€"}
                   </span>
                   <input
                     type="text"
                     name="salaryMax"
+                    defaultValue={currentJob?.salaryMax || "40"}
                     placeholder="40"
                     className="w-full h-11 pl-8 pr-3.5 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors"
                   />
@@ -315,6 +457,7 @@ const UpdateJobs = () => {
                 <div className="relative">
                   <select
                     name="frequency"
+                    defaultValue={currentJob?.frequency || "per hour"}
                     className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-white/10 bg-[#0e0f17] text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors appearance-none cursor-pointer"
                   >
                     <option
@@ -362,6 +505,7 @@ const UpdateJobs = () => {
                 name="responsibilities"
                 required
                 rows={4}
+                defaultValue={currentJob?.responsibilities || ""}
                 placeholder="Showcase your commitment to delivering exceptional user interfaces..."
                 className="w-full rounded-xl border border-white/10 bg-[#0e0f17] p-3.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors resize-y min-h-[100px] leading-relaxed"
               />
@@ -377,6 +521,7 @@ const UpdateJobs = () => {
                 name="requirements"
                 required
                 rows={5}
+                defaultValue={currentJob?.requirements || ""}
                 placeholder="• 3+ years of experience with React..."
                 className="w-full rounded-xl border border-white/10 bg-[#0e0f17] p-3.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/80 transition-colors resize-y min-h-[120px] leading-relaxed"
               />
@@ -394,19 +539,19 @@ const UpdateJobs = () => {
             {isSubmitting ? (
               <>
                 <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Publishing Job Listing...</span>
+                <span>Updating Job Listing...</span>
               </>
             ) : (
               <>
-                <span>Publish Job</span>
+                <span>Update Job Listing</span>
                 <ArrowRight className="size-4" />
               </>
             )}
           </button>
         </div>
-      </form> 
-        </div>
-    );
-};
+      </form>
+    </div>
+  );
+}
 
-export default UpdateJobs;
+ 
