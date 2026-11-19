@@ -2,32 +2,28 @@
 
 import { formatTimeAgo, getCategoryStyle } from "@/lib/jobHealper";
 import { IJobs } from "@/types/jobTypes";
-import { ChevronRight, Globe, MapPin, MoreVertical, Pencil, Plus, Trash2, Users } from "lucide-react";
+import {
+  Briefcase,
+  ChevronRight,
+  FileText,
+  Globe,
+  MapPin,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { DeleteJobs } from "./DeleteDialog";
 
-const JobsRow = ({jobs}: {jobs:IJobs[]}) => {
-
-
- 
-
-  // Handle job deletion
-
-
-  // Handle quick update save
-//   const handleSaveUpdate = (e: React.FormEvent) => {
-//     e.preventDefault()
-//     if (!editingJob) return
-//     setJobs((prev) => prev.map((j) => (j.id === editingJob.id ? editingJob : j)))
-//     toast.success(`"${editingJob.title}" updated successfully!`)
-//     setEditingJob(null)
-//   }
-
-  
+const JobsRow = ({ jobs = [] }: { jobs?: IJobs[] }) => {
+  const jobList = jobs ?? [];
+  const hasJobs = jobList.length > 0;
 
   return (
     <div className="w-full pb-20 space-y-7">
-      {/* Top Header Row matching Reference Image */}
+      {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
         <div className="space-y-1">
           {/* Breadcrumb */}
@@ -37,10 +33,17 @@ const JobsRow = ({jobs}: {jobs:IJobs[]}) => {
             <span className="text-[#8c82ff] font-medium">Job Listings & Postings</span>
           </div>
 
-          {/* Title */}
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Manage Job Posts
-          </h1>
+          {/* Title & Badge */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              Manage Job Posts
+            </h1>
+            {hasJobs && (
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#5c54f5]/15 border border-[#5c54f5]/30 text-[#a594fd]">
+                {jobList.length} {jobList.length === 1 ? "Job" : "Jobs"}
+              </span>
+            )}
+          </div>
 
           {/* Subtitle */}
           <p className="text-xs sm:text-sm text-neutral-400 max-w-2xl">
@@ -48,178 +51,215 @@ const JobsRow = ({jobs}: {jobs:IJobs[]}) => {
           </p>
         </div>
 
-        {/* Top Right Action Button: + + New Job Post */}
+        {/* Top Right Action Button */}
         <div className="shrink-0">
           <Link
             href="/dashboard/recruiter/add-jobs"
             className="h-10 px-5 rounded-full bg-[#5c54f5] hover:bg-[#4f46e5] text-white font-semibold text-xs sm:text-sm shadow-[0_0_20px_rgba(92,84,245,0.4)] transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Plus className="size-4 shrink-0" />
-            <span>+ New Job Post</span>
+            <span> New Job Post</span>
           </Link>
         </div>
       </div>
 
-      {/* Table Container Card */}
+      {/* Table or Empty State Container Card */}
       <div className="w-full rounded-2xl border border-white/[0.08] bg-[#0c0d14]/90 backdrop-blur-xl shadow-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[980px]">
-            {/* Table Header */}
-            <thead>
-              <tr className="border-b border-white/[0.06] bg-white/[0.01]">
-                <th className="py-4 px-5 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  JOB TITLE & DEPT
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  COMPANY & LOCATION
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  TYPE
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  COMPENSATION
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  APPLICANTS
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  STATUS
-                </th>
-                <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
-                  DEADLINE
-                </th>
-                <th className="py-4 px-5 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase text-right">
-                  ACTIONS
-                </th>
-              </tr>
-            </thead>
+        {!hasJobs ? (
+          /* Empty State View */
+          <div className="relative overflow-hidden px-6 py-16 sm:py-20 flex flex-col items-center justify-center text-center">
+            {/* Ambient Background Glow */}
+            <div
+              aria-hidden="true"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#5c54f5]/12 rounded-full blur-3xl pointer-events-none"
+            />
 
-            {/* Table Body */}
-            <tbody className="divide-y divide-white/[0.04]">
-              {jobs.map((job) =>{
-const { icon: CategoryIcon, bg, text } = getCategoryStyle(job.category)
-                return (
-                <tr
-                  key={job._id}
-                  className="hover:bg-white/[0.02] transition-colors group"
-                >
-                  {/* 1. Job Title & Dept */}
-                  <td className="py-4 px-5 align-middle">
-                    <div className="flex items-center gap-3">
-                      <CategoryIcon className="size-5 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white tracking-tight leading-snug">
-                          {job.title}
-                        </p>
-                        <p className={`${text} ${bg}`}>
-                          {job.category}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
+            {/* Glowing Icon Badge */}
+            <div className="relative mb-5">
+              <div className="size-20 sm:size-24 rounded-3xl bg-gradient-to-b from-[#5c54f5]/25 to-white/[0.02] border border-[#5c54f5]/30 flex items-center justify-center shadow-[0_0_35px_rgba(92,84,245,0.25)]">
+                <Briefcase className="size-10 sm:size-11 text-[#8c82ff]" />
+              </div>
+              <div className="absolute -top-1.5 -right-1.5 size-7 rounded-full bg-[#5c54f5] text-white flex items-center justify-center shadow-lg border-2 border-[#0c0d14]">
+                <Sparkles className="size-3.5" />
+              </div>
+            </div>
 
-                  {/* 2. Company & Location */}
-                  <td className="py-4 px-4 align-middle">
-                    <div className="space-y-0.5">
-                      <p className="text-xs font-medium text-neutral-300">
-                        {job.company}
-                      </p>
-                      <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-                        {job.isRemote ? (
-                          <Globe className="size-3.5 text-neutral-500 shrink-0" />
-                        ) : (
-                          <MapPin className="size-3.5 text-neutral-500 shrink-0" />
-                        )}
-                        <span className="truncate max-w-[170px]">{job.location}</span>
-                      </div>
-                    </div>
-                  </td>
+            {/* Status Pill */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#5c54f5]/10 border border-[#5c54f5]/20 text-[#a594fd] mb-3">
+              <span>No Active Postings</span>
+            </div>
 
-                  {/* 3. Type */}
-                  <td className="py-4 px-4 align-middle">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/[0.04] border border-white/[0.08] text-neutral-300">
-                      {job.jobType}
-                    </span>
-                  </td>
+            {/* Heading */}
+            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              No Job Posts Yet
+            </h3>
 
-                  {/* 4. Compensation */}
-                  <td className="py-4 px-4 align-middle">
-                    <span className="text-xs sm:text-sm font-medium text-white whitespace-nowrap">
-                      {`${job.salaryMin}${job.salaryCurrency}-${job.salaryMax}${job.salaryCurrency} / ${job.frequency}`}
-                    </span>
-                  </td>
+            {/* Description */}
+            <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto mt-2 leading-relaxed">
+              You haven&apos;t created any job openings yet. Start publishing listings to discover and connect with top candidates for your team.
+            </p>
 
-                  {/* 5. Applicants */}
-                  <td className="py-4 px-4 align-middle">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-[#8c82ff] whitespace-nowrap">
-                      <Users className="size-4 shrink-0 text-[#8c82ff]" />
-                      <span>10 Candidates</span>
-                    </div>
-                  </td>
-
-                  {/* 6. Status */}
-                  <td className="py-4 px-4 align-middle">
-                    {job.status === "Active" ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                        <span className="size-1.5 rounded-full bg-emerald-400" />
-                        <span>Active</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-800/80 border border-neutral-700/60 text-neutral-400">
-                        <span className="size-1.5 rounded-full bg-neutral-500" />
-                        <span>Expired</span>
-                      </span>
-                    )}
-                  </td>
-
-                  {/* 7. Deadline */}
-                  <td className="py-4 px-4 align-middle">
-                    <div className="space-y-0.5 whitespace-nowrap">
-                      <p className="text-xs font-medium text-white">
-                        {job.deadline}
-                      </p>
-                      <p className="text-[11px] text-neutral-500">
-                        {formatTimeAgo(job.createdAt)}
-                      </p>
-                    </div>
-                  </td>
-
-                  {/* 8. Actions */}
-                  <td className="py-4 px-5 align-middle text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {/* Update Button */}
-                      <button
-                        type="button"
-                        className="h-8 px-3 rounded-xl bg-[#5c54f5]/15 hover:bg-[#5c54f5]/25 border border-[#5c54f5]/30 text-[#c7d2fe] hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-                        title="Update job"
-                      >
-                        <Pencil className="size-3.5" />
-                        <span>Update</span>
-                      </button>
-
-                      {/* Delete Button */}
-                      <DeleteJobs job={job} />
-
-                      {/* More Menu */}
-                      <button
-                        type="button"
-                        className="size-8 rounded-xl hover:bg-white/[0.05] text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                        title="More options"
-                      >
-                        <MoreVertical className="size-4" />
-                      </button>
-                    </div>
-                  </td>
+          </div>
+        ) : (
+          /* Table View */
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[980px]">
+              {/* Table Header */}
+              <thead>
+                <tr className="border-b border-white/[0.06] bg-white/[0.01]">
+                  <th className="py-4 px-5 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    JOB TITLE & DEPT
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    COMPANY & LOCATION
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    TYPE
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    COMPENSATION
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    APPLICANTS
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    STATUS
+                  </th>
+                  <th className="py-4 px-4 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                    DEADLINE
+                  </th>
+                  <th className="py-4 px-5 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase text-right">
+                    ACTIONS
+                  </th>
                 </tr>
-              )})}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
 
-     
+              {/* Table Body */}
+              <tbody className="divide-y divide-white/[0.04]">
+                {jobList.map((job) => {
+                  const { icon: CategoryIcon, bg, text } = getCategoryStyle(job.category);
+                  return (
+                    <tr
+                      key={job._id}
+                      className="hover:bg-white/[0.02] transition-colors group"
+                    >
+                      {/* 1. Job Title & Dept */}
+                      <td className="py-4 px-5 align-middle">
+                        <div className="flex items-center gap-3">
+                          <CategoryIcon className="size-5 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-white tracking-tight leading-snug">
+                              {job.title}
+                            </p>
+                            <p className={`${text} ${bg}`}>
+                              {job.category}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 2. Company & Location */}
+                      <td className="py-4 px-4 align-middle">
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-medium text-neutral-300">
+                            {job.company}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+                            {job.isRemote ? (
+                              <Globe className="size-3.5 text-neutral-500 shrink-0" />
+                            ) : (
+                              <MapPin className="size-3.5 text-neutral-500 shrink-0" />
+                            )}
+                            <span className="truncate max-w-[170px]">{job.location}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 3. Type */}
+                      <td className="py-4 px-4 align-middle">
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/[0.04] border border-white/[0.08] text-neutral-300">
+                          {job.jobType}
+                        </span>
+                      </td>
+
+                      {/* 4. Compensation */}
+                      <td className="py-4 px-4 align-middle">
+                        <span className="text-xs sm:text-sm font-medium text-white whitespace-nowrap">
+                          {`${job.salaryMin}${job.salaryCurrency}-${job.salaryMax}${job.salaryCurrency} / ${job.frequency}`}
+                        </span>
+                      </td>
+
+                      {/* 5. Applicants */}
+                      <td className="py-4 px-4 align-middle">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-[#8c82ff] whitespace-nowrap">
+                          <Users className="size-4 shrink-0 text-[#8c82ff]" />
+                          <span>10 Candidates</span>
+                        </div>
+                      </td>
+
+                      {/* 6. Status */}
+                      <td className="py-4 px-4 align-middle">
+                        {job.status === "Active" ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                            <span className="size-1.5 rounded-full bg-emerald-400" />
+                            <span>Active</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-800/80 border border-neutral-700/60 text-neutral-400">
+                            <span className="size-1.5 rounded-full bg-neutral-500" />
+                            <span>Expired</span>
+                          </span>
+                        )}
+                      </td>
+
+                      {/* 7. Deadline */}
+                      <td className="py-4 px-4 align-middle">
+                        <div className="space-y-0.5 whitespace-nowrap">
+                          <p className="text-xs font-medium text-white">
+                            {job.deadline}
+                          </p>
+                          <p className="text-[11px] text-neutral-500">
+                            {formatTimeAgo(job.createdAt)}
+                          </p>
+                        </div>
+                      </td>
+
+                      {/* 8. Actions */}
+                      <td className="py-4 px-5 align-middle text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Update Button */}
+                          <button
+                            type="button"
+                            className="h-8 px-3 rounded-xl bg-[#5c54f5]/15 hover:bg-[#5c54f5]/25 border border-[#5c54f5]/30 text-[#c7d2fe] hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title="Update job"
+                          >
+                            <Pencil className="size-3.5" />
+                            <span>Update</span>
+                          </button>
+
+                          {/* Delete Button */}
+                          <DeleteJobs job={job} />
+
+                          {/* More Menu */}
+                          <button
+                            type="button"
+                            className="size-8 rounded-xl hover:bg-white/[0.05] text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                            title="More options"
+                          >
+                            <MoreVertical className="size-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 };
 
 export default JobsRow;
